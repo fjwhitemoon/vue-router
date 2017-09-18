@@ -89,7 +89,7 @@ var View = {
       }
     }
 
-    // also regiseter instance in prepatch hook
+    // also register instance in prepatch hook
     // in case the same component instance is reused across different routes
     ;(data.hook || (data.hook = {})).prepatch = function (_, vnode) {
       matched.instances[name] = vnode.componentInstance;
@@ -602,14 +602,14 @@ function cleanPath (path) {
   return path.replace(/\/\//g, '/')
 }
 
-var index$1 = Array.isArray || function (arr) {
+var _isarray_0_0_1_isarray = Array.isArray || function (arr) {
   return Object.prototype.toString.call(arr) == '[object Array]';
 };
 
 /**
  * Expose `pathToRegexp`.
  */
-var index = pathToRegexp;
+var _pathToRegexp_1_7_0_pathToRegexp = pathToRegexp;
 var parse_1 = parse;
 var compile_1 = compile;
 var tokensToFunction_1 = tokensToFunction;
@@ -786,7 +786,7 @@ function tokensToFunction (tokens) {
         }
       }
 
-      if (index$1(value)) {
+      if (_isarray_0_0_1_isarray(value)) {
         if (!token.repeat) {
           throw new TypeError('Expected "' + token.name + '" to not repeat, but received `' + JSON.stringify(value) + '`')
         }
@@ -937,7 +937,7 @@ function stringToRegexp (path, keys, options) {
  * @return {!RegExp}
  */
 function tokensToRegExp (tokens, keys, options) {
-  if (!index$1(keys)) {
+  if (!_isarray_0_0_1_isarray(keys)) {
     options = /** @type {!Object} */ (keys || options);
     keys = [];
   }
@@ -1013,7 +1013,7 @@ function tokensToRegExp (tokens, keys, options) {
  * @return {!RegExp}
  */
 function pathToRegexp (path, keys, options) {
-  if (!index$1(keys)) {
+  if (!_isarray_0_0_1_isarray(keys)) {
     options = /** @type {!Object} */ (keys || options);
     keys = [];
   }
@@ -1024,17 +1024,17 @@ function pathToRegexp (path, keys, options) {
     return regexpToRegexp(path, /** @type {!Array} */ (keys))
   }
 
-  if (index$1(path)) {
+  if (_isarray_0_0_1_isarray(path)) {
     return arrayToRegexp(/** @type {!Array} */ (path), /** @type {!Array} */ (keys), options)
   }
 
   return stringToRegexp(/** @type {string} */ (path), /** @type {!Array} */ (keys), options)
 }
 
-index.parse = parse_1;
-index.compile = compile_1;
-index.tokensToFunction = tokensToFunction_1;
-index.tokensToRegExp = tokensToRegExp_1;
+_pathToRegexp_1_7_0_pathToRegexp.parse = parse_1;
+_pathToRegexp_1_7_0_pathToRegexp.compile = compile_1;
+_pathToRegexp_1_7_0_pathToRegexp.tokensToFunction = tokensToFunction_1;
+_pathToRegexp_1_7_0_pathToRegexp.tokensToRegExp = tokensToRegExp_1;
 
 /*  */
 
@@ -1048,7 +1048,7 @@ function fillParams (
   try {
     var filler =
       regexpCompileCache[path] ||
-      (regexpCompileCache[path] = index.compile(path));
+      (regexpCompileCache[path] = _pathToRegexp_1_7_0_pathToRegexp.compile(path));
     return filler(params || {}, { pretty: true })
   } catch (e) {
     if (process.env.NODE_ENV !== 'production') {
@@ -1110,8 +1110,12 @@ function addRouteRecord (
     );
   }
 
-  var normalizedPath = normalizePath(path, parent);
   var pathToRegexpOptions = route.pathToRegexpOptions || {};
+  var normalizedPath = normalizePath(
+    path,
+    parent,
+    pathToRegexpOptions.strict
+  );
 
   if (typeof route.caseSensitive === 'boolean') {
     pathToRegexpOptions.sensitive = route.caseSensitive;
@@ -1199,7 +1203,7 @@ function addRouteRecord (
 }
 
 function compileRouteRegex (path, pathToRegexpOptions) {
-  var regex = index(path, [], pathToRegexpOptions);
+  var regex = _pathToRegexp_1_7_0_pathToRegexp(path, [], pathToRegexpOptions);
   if (process.env.NODE_ENV !== 'production') {
     var keys = {};
     regex.keys.forEach(function (key) {
@@ -1210,8 +1214,8 @@ function compileRouteRegex (path, pathToRegexpOptions) {
   return regex
 }
 
-function normalizePath (path, parent) {
-  path = path.replace(/\/$/, '');
+function normalizePath (path, parent, strict) {
+  if (!strict) { path = path.replace(/\/$/, ''); }
   if (path[0] === '/') { return path }
   if (parent == null) { return path }
   return cleanPath(((parent.path) + "/" + path))
@@ -1487,6 +1491,8 @@ function setupScroll () {
     saveScrollPosition();
     if (e.state && e.state.key) {
       setStateKey(e.state.key);
+    } else {
+      setStateKey('');
     }
   });
 }
@@ -1604,11 +1610,9 @@ var supportsPushState = inBrowser && (function () {
 })();
 
 // use User Timing api (if present) for more accurate key precision
-var Time = inBrowser && window.performance && window.performance.now
-  ? window.performance
-  : Date;
+var Time =  Date;
 
-var _key = genKey();
+var _key = '';
 
 function genKey () {
   return Time.now().toFixed(3)
@@ -2480,6 +2484,10 @@ VueRouter.prototype.addRoutes = function addRoutes (routes) {
   if (this.history.current !== START) {
     this.history.transitionTo(this.history.getCurrentLocation());
   }
+};
+
+VueRouter.prototype.getCurrentStateKey = function getCurrentStateKey () {
+  return supportsPushState ? getStateKey() : '';
 };
 
 Object.defineProperties( VueRouter.prototype, prototypeAccessors );

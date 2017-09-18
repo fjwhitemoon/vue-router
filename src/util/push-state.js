@@ -19,11 +19,9 @@ export const supportsPushState = inBrowser && (function () {
 })()
 
 // use User Timing api (if present) for more accurate key precision
-const Time = inBrowser && window.performance && window.performance.now
-  ? window.performance
-  : Date
+const Time =  Date
 
-let _key: string = genKey()
+let _key: string = ''
 
 function genKey (): string {
   return Time.now().toFixed(3)

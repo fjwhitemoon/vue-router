@@ -11,6 +11,8 @@ export function setupScroll () {
     saveScrollPosition()
     if (e.state && e.state.key) {
       setStateKey(e.state.key)
+    } else {
+      setStateKey('')
     }
   })
 }
